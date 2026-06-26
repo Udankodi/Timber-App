@@ -1,1 +1,8 @@
-
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.udankodi.twa",
+        "sha256_cert_fingerprints": ["A7:F0:98:44:A0:0A:4D:D7:BB:0C:48:B9:BA:BF:22:E8:84:14:7C:96:20:A7:61:87:D3:31:39:CF:D9:7C:53:FA"]
+      }
+    }]
