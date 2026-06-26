@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <title>Timber Mobile Manager</title>
+
+        <!-- Link to your new manifest file -->
+        <link rel="manifest" href="manifest.json">
+
+        <!-- Mobile App Apple/Android Meta Tags -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="theme-color" content="#2c3e50">
+
+        <style>
+            /* ... rest of your CSS styles remain exactly the same ... */
+
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Timber Inventory & Lot Manager (Isolated Modes)</title>
+       <style>
+           body {
+               font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+               background-color: #f4f7f6;
+               margin: 0;
+               padding: 20px;
+               display: flex;
+               flex-direction: column;
+               align-items: center;
+           }
+           .container {
+               width: 100%;
+               max-width: 1000px;
+           }
+           .card {
+               background: #ffffff;
+               padding: 25px;
+               border-radius: 12px;
+               box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+               margin-bottom: 20px;
+               box-sizing: border-box;
+           }
+           h2, h3, h4 {
+               color: #2c3e50;
+               margin-top: 0;
+           }
+           h2 {
+               border-bottom: 2px solid #27ae60;
+               padding-bottom: 10px;
+               text-align: center;
+           }
+           /* Mode Selection Screen */
+           .mode-screen {
+               text-align: center;
+               padding: 50px 20px;
+           }
+           .mode-buttons {
+               display: flex;
+               justify-content: center;
+               gap: 20px;
+               margin-top: 30px;
+           }
+           .btn-mode {
+               padding: 20px 40px;
+               font-size: 20px;
+               cursor: pointer;
+               border: none;
+               border-radius: 8px;
+               font-weight: bold;
+               transition: all 0.2s;
+           }
+           .btn-buying { background-color: #2980b9; color: white; }
+           .btn-buying:hover { background-color: #2471a3; }
+           .btn-selling { background-color: #d35400; color: white; }
+           .btn-selling:hover { background-color: #ba4a00; }
+
+           /* Layout Grids */
+           .layout-grid {
+               display: flex;
+               gap: 20px;
+               margin-bottom: 20px;
+               flex-wrap: wrap;
+           }
+           .entry-card { flex: 3; min-width: 300px; }
+           .rates-card { flex: 2; min-width: 280px; border-top: 4px solid #27ae60; }
+
+           .input-row { display: flex; flex-direction: column; gap: 12px; }
+           .length-container { display: flex; gap: 10px; }
+           .length-container div { flex: 1; }
+
+           .rate-input-row {
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               margin-bottom: 10px;
+               font-size: 14px;
+           }
+           .rate-input-row input { width: 90px; padding: 6px; text-align: right; }
+
+           label { display: block; margin-bottom: 4px; color: #34495e; font-weight: 600; font-size: 14px; }
+           input, select {
+               width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px;
+           }
+
+           /* Buttons */
+           button {
+               background-color: #27ae60; color: white; padding: 10px 18px; border: none;
+               border-radius: 6px; font-size: 15px; cursor: pointer; font-weight: bold; transition: background 0.2s;
+           }
+           button:hover { background-color: #219653; }
+           .btn-secondary { background-color: #7f8c8d; }
+           .btn-secondary:hover { background-color: #6c7a7d; }
+           .btn-danger { background-color: #c0392b; }
+           .btn-danger:hover { background-color: #922b21; }
+
+           /* Lot Navigation tabs */
+           .lot-management-bar {
+               display: flex;
+               flex-wrap: wrap;
+               gap: 10px;
+               align-items: center;
+               margin-bottom: 20px;
+           }
+           .lot-tab {
+               padding: 10px 15px;
+               background: #e0e0e0;
+               border-radius: 6px;
+               cursor: pointer;
+               font-weight: 600;
+               font-size: 14px;
+           }
+           .lot-tab.active {
+               background: #27ae60;
+               color: white;
+           }
+
+           /* Tables */
+           table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: #fff; }
+           th, td { border: 1px solid #e0e0e0; padding: 10px; text-align: left; font-size: 14px; }
+           th { background-color: #ecf0f1; color: #2c3e50; }
+
+           /* Summary Dashboard */
+           .summary-card {
+               background: #2c3e50; color: white; display: flex; justify-content: space-around; text-align: center; padding: 20px;
+           }
+           .summary-item h4 { margin: 0 0 5px 0; color: #bdc3c7; font-weight: 400; }
+           .summary-item p { margin: 0; font-size: 24px; font-weight: bold; color: #2ecc71; }
+
+           .header-controls {
+               display: flex;
+               justify-content: space-between;
+               align-items: center;
+               margin-bottom: 15px;
+               width: 100%;
+           }
+           .badge {
+               padding: 5px 12px;
+               border-radius: 20px;
+               font-weight: bold;
+               font-size: 14px;
+               color: white;
+           }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div id="modeScreen" class="card mode-screen">
+        <h2>Timber Inventory Manager</h2>
+        <p>Please select your operation mode to begin:</p>
+        <div class="mode-buttons">
+            <button class="btn-mode btn-buying" onclick="setAppMode('Buying')">BUYING MODE</button>
+            <button class="btn-mode btn-selling" onclick="setAppMode('Selling')">SELLING MODE</button>
+        </div>
+    </div>
+
+    <div id="mainDashboard" style="display: none;">
+        
+        <div class="header-controls">
+            <div>
+                <span id="modeBadge" class="badge">Mode</span>
+                <button class="btn-secondary" style="margin-left: 10px; padding: 5px 10px; font-size: 12px;" onclick="resetToModeSelection()">Change Mode</button>
+            </div>
+            <button class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="clearAllData()">Reset Entire System</button>
+        </div>
+
+        <div class="card">
+            <h3><span id="lotDirTitle"></span> Lots Directory</h3>
+            <div class="input-row" style="flex-direction: row; align-items: center; gap: 10px;">
+                <input type="text" id="newLotName" placeholder="Enter a name for this new lot..." style="flex: 3;">
+                <button onclick="createNewLot()" style="flex: 1; white-space: nowrap;">Create Lot</button>
+            </div>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+            <div id="lotsContainer" class="lot-management-bar">
+                </div>
+        </div>
+
+        <div id="currentLotWorkspace" style="display: none;">
+            <div class="layout-grid">
+                <div class="card entry-card">
+                    <h3>Add Log Dimensions (<span id="workspaceLotTitle"></span>)</h3>
+                    <div class="input-row">
+                        <div>
+                            <label>Length:</label>
+                            <div class="length-container">
+                                <input type="number" id="lengthFeet" placeholder="Feet" min="0" value="0">
+                                <input type="number" id="lengthInches" placeholder="Inches" min="0" max="11" value="0">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="girth">Girth / Round Size (Inches):</label>
+                            <input type="number" id="girth" placeholder="e.g., 36" min="0" step="any">
+                        </div>
+                        <button onclick="addLogToCurrentLot()">Save Log Entry</button>
+                    </div>
+                </div>
+
+                <div class="card rates-card">
+                    <h3>Lot Category Rates Configuration</h3>
+                    <p style="font-size: 11px; color: #7f8c8d; margin-top: -8px; margin-bottom: 12px;">
+                        Set pricing structures unique to this lot. Updates take effect immediately.
+                    </p>
+                    <div id="ratesForm"></div>
+                </div>
+            </div>
+
+            <div id="tablesContainer"></div>
+
+            <div class="card summary-card">
+                <div class="summary-item">
+                    <h4>Logs in Lot</h4>
+                    <p id="totalLogsCount">0</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Lot Total Volume</h4>
+                    <p id="grandVolume">0 CFT 0 In</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Lot Amount Due</h4>
+                    <p id="grandAmount">0.00</p>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+const categoryRanges = [
+    { id: "cat1", name: "Less than 24 inches", min: 0, max: 23.99 },
+    { id: "cat2", name: "24 to 29 inches", min: 24, max: 29.99 },
+    { id: "cat3", name: "30 to 35 inches", min: 30, max: 35.99 },
+    { id: "cat4", name: "36 to 47 inches", min: 36, max: 47.99 },
+    { id: "cat5", name: "48 to 59 inches", min: 48, max: 59.99 },
+    { id: "cat6", name: "60 inches and above", min: 60, max: Infinity }
+];
+
+let appState = {
+    mode: null, // 'Buying' or 'Selling'
+    lots: [],   // Array containing structural objects of individual lots
+    activeBuyingLotId: null, // Track last active lot per mode
+    activeSellingLotId: null
+};
+
+window.onload = function() {
+    const savedData = localStorage.getItem('timber_inventory_state');
+    if (savedData) {
+        appState = JSON.parse(savedData);
+        if (appState.mode) {
+            renderActiveDashboardMode();
+        }
+    }
+};
+
+function saveStateToStorage() {
+    localStorage.setItem('timber_inventory_state', JSON.stringify(appState));
+}
+
+function setAppMode(selectedMode) {
+    appState.mode = selectedMode;
+    saveStateToStorage();
+    renderActiveDashboardMode();
+}
+
+function resetToModeSelection() {
+    appState.mode = null;
+    saveStateToStorage();
+    document.getElementById('mainDashboard').style.display = 'none';
+    document.getElementById('modeScreen').style.display = 'block';
+}
+
+function getActiveLotId() {
+    return appState.mode === 'Buying' ? appState.activeBuyingLotId : appState.activeSellingLotId;
+}
+
+function setActiveLotId(id) {
+    if (appState.mode === 'Buying') {
+        appState.activeBuyingLotId = id;
+    } else {
+        appState.activeSellingLotId = id;
+    }
+}
+
+function renderActiveDashboardMode() {
+    document.getElementById('modeScreen').style.display = 'none';
+    document.getElementById('mainDashboard').style.display = 'block';
+    
+    document.getElementById('lotDirTitle').innerText = appState.mode;
+    
+    const badge = document.getElementById('modeBadge');
+    badge.innerText = appState.mode.toUpperCase() + " OPERATION";
+    badge.style.backgroundColor = (appState.mode === 'Buying') ? '#2980b9' : '#d35400';
+    
+    renderLotTabs();
+    loadActiveLotWorkspace();
+}
+
+function createNewLot() {
+    const nameInput = document.getElementById('newLotName');
+    const name = nameInput.value.trim();
+    if (!name) { alert("Please provide a valid name designation for your lot."); return; }
+
+    const newId = 'lot_' + Date.now();
+    
+    const lotProfile = {
+        id: newId,
+        mode: appState.mode, // Locked cleanly to current appState.mode
+        name: name,
+        rates: { cat1: 0, cat2: 0, cat3: 0, cat4: 0, cat5: 0, cat6: 0 },
+        logs: []
+    };
+
+    appState.lots.push(lotProfile);
+    setActiveLotId(newId);
+    nameInput.value = '';
+    
+    saveStateToStorage();
+    renderLotTabs();
+    loadActiveLotWorkspace();
+}
+
+function selectLot(lotId) {
+    setActiveLotId(lotId);
+    saveStateToStorage();
+    renderLotTabs();
+    loadActiveLotWorkspace();
+}
+
+function renderLotTabs() {
+    const container = document.getElementById('lotsContainer');
+    container.innerHTML = '';
+    
+    // Filter array to strictly show lots matching active operation mode
+    const filteredLots = appState.lots.filter(lot => lot.mode === appState.mode);
+    
+    if (filteredLots.length === 0) {
+        container.innerHTML = `<em style="color:#7f8c8d; font-size:14px;">No active ${appState.mode.toLowerCase()} lots defined yet. Create your first lot above.</em>`;
+        return;
+    }
+
+    const currentActiveId = getActiveLotId();
+
+    filteredLots.forEach(lot => {
+        const tab = document.createElement('div');
+        tab.className = `lot-tab ${lot.id === currentActiveId ? 'active' : ''}`;
+        tab.innerText = lot.name;
+        tab.onclick = () => selectLot(lot.id);
+        container.appendChild(tab);
+    });
+}
+
+function loadActiveLotWorkspace() {
+    const workspace = document.getElementById('currentLotWorkspace');
+    const currentActiveId = getActiveLotId();
+    
+    const activeLot = appState.lots.find(l => l.id === currentActiveId && l.mode === appState.mode);
+    
+    if (!activeLot) {
+        workspace.style.display = 'none';
+        return;
+    }
+    
+    workspace.style.display = 'block';
+    document.getElementById('workspaceLotTitle').innerText = activeLot.name;
+    
+    renderRatesPanel(activeLot);
+    updateUI(activeLot);
+}
+
+function renderRatesPanel(activeLot) {
+    const container = document.getElementById('ratesForm');
+    container.innerHTML = '';
+    
+    categoryRanges.forEach(range => {
+        const row = document.createElement('div');
+        row.className = 'rate-input-row';
+        const currentRate = activeLot.rates[range.id] || 0;
+        row.innerHTML = `
+            <label><strong>${range.name}:</strong></label>
+            <input type="number" value="${currentRate}" min="0" step="any" oninput="updateActiveLotRate('${range.id}', this.value)">
+        `;
+        container.appendChild(row);
+    });
+}
+
+function updateActiveLotRate(catId, value) {
+    const rateValue = parseFloat(value) || 0;
+    const currentActiveId = getActiveLotId();
+    const activeLot = appState.lots.find(l => l.id === currentActiveId);
+    if (activeLot) {
+        activeLot.rates[catId] = rateValue;
+        saveStateToStorage();
+        updateUI(activeLot);
+    }
+}
+
+function addLogToCurrentLot() {
+    const currentActiveId = getActiveLotId();
+    const activeLot = appState.lots.find(l => l.id === currentActiveId);
+    if (!activeLot) return;
+
+    const feet = parseFloat(document.getElementById('lengthFeet').value) || 0;
+    const inches = parseFloat(document.getElementById('lengthInches').value) || 0;
+    const girth = parseFloat(document.getElementById('girth').value);
+
+    if (isNaN(girth) || girth <= 0 || (feet === 0 && inches === 0)) {
+        alert("Please enter valid positive dimension parameters.");
+        return;
+    }
+
+    const totalLengthInFeet = feet + (inches / 12);
+    const rawVolume = (girth * girth * totalLengthInFeet) / 2304;
+
+    const finalCFT = Math.floor(rawVolume);
+    const decimalPart = rawVolume - finalCFT;
+    const finalVolumeInches = Math.floor(decimalPart * 12); 
+
+    const targetRange = categoryRanges.find(cat => girth >= cat.min && girth <= cat.max);
+    
+    const newLog = {
+        id: 'log_' + Date.now(),
+        lengthDisplay: `${feet}' ${inches}"`,
+        girth: girth,
+        cft: finalCFT,
+        inches: finalVolumeInches,
+        categoryId: targetRange ? targetRange.id : "cat6"
+    };
+
+    activeLot.logs.push(newLog);
+    saveStateToStorage();
+    updateUI(activeLot);
+    
+    document.getElementById('lengthFeet').value = 0;
+    document.getElementById('lengthInches').value = 0;
+    document.getElementById('girth').value = '';
+}
+
+function updateUI(activeLot) {
+    const container = document.getElementById('tablesContainer');
+    container.innerHTML = ''; 
+
+    let runningGrandCFT = 0;
+    let runningGrandInches = 0;
+    let runningGrandAmount = 0;
+
+    categoryRanges.forEach(range => {
+        const filteredLogs = activeLot.logs.filter(log => log.categoryId === range.id);
+        if (filteredLogs.length === 0) return;
+
+        let catCftSum = 0;
+        let catInchesSum = 0;
+        const currentRate = activeLot.rates[range.id] || 0;
+        
+        const catCard = document.createElement('div');
+        catCard.className = 'card';
+        
+        let tableHTML = `
+            <h3>Category Table: ${range.name} <span style="font-size:14px; color:#7f8c8d; font-weight:normal;">(Rate per CFT: ${currentRate.toFixed(2)})</span></h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Length</th>
+                        <th>Girth (In)</th>
+                        <th>Cubic Units Balance</th>
+                        <th>Line Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        filteredLogs.forEach((log, index) => {
+            catCftSum += log.cft;
+            catInchesSum += log.inches;
+            
+            const logBillableVol = log.cft + (log.inches / 12);
+            const logAmount = logBillableVol * currentRate;
+            
+            tableHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${log.lengthDisplay}</td>
+                    <td>${log.girth}"</td>
+                    <td>${log.cft} CFT ${log.inches} In</td>
+                    <td>${logAmount.toFixed(2)}</td>
+                </tr>
+            `;
+        });
+
+        const extraCFTFromInches = Math.floor(catInchesSum / 12);
+        const finalCatCFT = catCftSum + extraCFTFromInches;
+        const finalCatInches = catInchesSum % 12;
+
+        const catBillableVolume = finalCatCFT + (finalCatInches / 12);
+        const totalCatAmount = catBillableVolume * currentRate;
+
+        tableHTML += `
+                <tr style="font-weight: bold; background-color: #fcfcfc;">
+                    <td colspan="3" style="text-align: right;">Category Total:</td>
+                    <td>${finalCatCFT} CFT ${finalCatInches} In</td>
+                    <td>${totalCatAmount.toFixed(2)}</td>
+                </tr>
+            </tbody>
+            </table>
+        `;
+
+        catCard.innerHTML = tableHTML;
+        container.appendChild(catCard);
+
+        runningGrandCFT += finalCatCFT;
+        runningGrandInches += finalCatInches;
+        runningGrandAmount += totalCatAmount;
+    });
+
+    const grandExtraCFT = Math.floor(runningGrandInches / 12);
+    const finalGrandCFT = runningGrandCFT + grandExtraCFT;
+    const finalGrandInches = runningGrandInches % 12;
+
+    document.getElementById('totalLogsCount').innerText = activeLot.logs.length;
+    document.getElementById('grandVolume').innerText = `${finalGrandCFT} CFT ${finalGrandInches} In`;
+    document.getElementById('grandAmount').innerText = runningGrandAmount.toFixed(2);
+}
+
+function clearAllData() {
+    if(confirm("CRITICAL WARNING: This permanently deletes ALL data across both Buying and Selling operations. Proceed?")) {
+        localStorage.removeItem('timber_inventory_state');
+        appState = { mode: null, lots: [], activeBuyingLotId: null, activeSellingLotId: null };
+        document.getElementById('mainDashboard').style.display = 'none';
+        document.getElementById('modeScreen').style.display = 'block';
+    }
+}
+</script>
+
+</body>
+</html>
